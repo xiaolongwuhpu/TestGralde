@@ -1,0 +1,11 @@
+include ':app'
+
+// setting.gradle 中修改为 In setting
+println "In setting, gradle id is " +gradle.hashCode()
+println "Home Dir:" + gradle.getGradleHomeDir()
+println "User Home Dir:" + gradle.gradleUserHomeDir
+println "Parent: " + gradle.parent
+
+
+
+

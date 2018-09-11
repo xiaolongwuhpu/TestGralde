@@ -1,0 +1,294 @@
+apply plugin: 'com.android.application'
+android {
+    compileSdkVersion 28
+    defaultConfig {
+        applicationId "com.testgradlew.longwu.testgradle"
+        minSdkVersion 21
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.android.support:appcompat-v7:28.0.0-rc02'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+}
+
+//Groovy 基础语法
+
+//Groovy注释标记和Java一样，支持//或者/**/
+//Groovy语句可以不用分号结尾。Groovy为了尽量减少代码的输入，确实煞费苦心
+//Groovy中支持动态类型，即定义变量的时候可以不指定其类型。Groovy中，变量定义可以使用关键字def。注意，虽然def不是必须的，但是为了代码清晰，建议还是使用def关键字
+
+/**
+ def variable1 = helloWorld   //可以不使用分号结尾
+ def varable2 = "groovy"
+ def  int x = 999   //变量定义时，也可以直接指定类型
+ 函数定义时，参数的类型也可以不指定。比如
+ String testMethod(arg1,arg2){//无需指定参数类型
+ ...}除了变量定义可以不指定类型外，Groovy中函数的返回值也可以是无类型的。比如：
+ //无类型的函数定义，必须使用def关键字
+
+
+ */
+
+def nonReturnMethod() {
+    "我测试一下,是不是会返回这句话"
+    '无返回类型必须使用def修饰'   //最后一行代码的执行结果就是本函数的返回值
+}
+
+//如果指定了函数返回类型，则可不必加def关键字来定义函数
+String getString() {
+    return "我是字符串类型的返回值"
+}
+
+task testReturnType << {
+    println("记住: " + nonReturnMethod())  // 返回结果;  一 \n    记住: 无返回类型必须使用def修饰
+}
+
+//单双引号的区别
+//单引号 的内容严格对应Java中的String，不对$符号进行转义
+def str1 = '我是 $ 单引号'
+
+def x = "双"
+def str2 = "我是 $x 引号"
+//def str3 = "我是 $y 引号" //直接报错,没有找到y的值
+task testyinhao << {
+    println(str1)   // 我是 $ 单引号
+    println(str2)   // 我是 双引号
+}
+
+//List map Range
+
+//list
+task testlist << {
+    /* def mlist = [1, "2", 3.0, '4']  //可以存储不同类型的
+     assert mlist[1] == '2': "断言,如果等式成立没问题, 不成立时,这个就是抛出异常的提示"
+     //当你使用断言时，你应用包含一条消息。此消息可以帮助其他人维护和理解你的代码，理清你的意图
+     mlist[9] == 9.0
+ //    assert mlist[10] == true: "如果等式不成立或者未赋值,就会抛异常"
+     println mlist.size()*/
+
+    def list1 = ['Groovy 1.8', 'Groovy 2.0', 'Groovy 2.3']
+    def list2 = ['Groovy 1.8', 'Groovy 2.0', 'Groovy 2.3']
+    assert list1 == list2: "相当于equals"    //比较内容相等
+    assert !list1.is(list2): "is是地址引用"  //比较引用相等
+
+//    list1.each {
+//        println it
+//    }
+}
+
+//map
+
+tasks.create("testmap", {
+    def mmap = ["a": "aa", "b": "bb"]  //key必须是字符串，value可以是任何对象。另外，key可以用''或""包起来，也可以不用引号包起来。比如
+    def mmap2 = [a: true, b: 2]
+
+    doLast {
+        mmap.each {
+            println it.getKey() + "===" + it.getValue()
+        }
+        println "---------------------------------------"
+        println(mmap.a + "==" + mmap.get("a"))
+    }
+})
+
+//Range
+
+task testRange << {
+    def mRange = 3..20 //3-10
+    def mRange2 = 3..<20 //3-9    <表示小于最后一位数
+    println "总数:" + mRange.size() + "; 开始值:" + mRange.from + "; 结束值: " + mRange.to + "; 步伐为2时: " + mRange.step(2)
+}
+
+//task 五种创建方式,如果没有你特殊需求,推荐使用第二种方式; 第四中创建方式有时为了省事用的也很多
+
+tasks.create("one", {
+//    println("一零")  // 执行这个gralde文件中的任意一个task任务 ,都会触发这一行
+    doLast {
+        println("一")
+
+    }
+})
+/*
+一零
+三零
+四零
+五零
+一
+* */
+// 下边同理不在一一列举运行结果,自己敲一遍或者下载我的demo运行一下即可.
+
+task two << {  //不能使用 doFirst/doLast 语句
+    println("二零")
+    //特殊,只有执行gradlew -q two才会触发.另外四种方式创建的task, 都不要直接在大括号内{ }写可执行的代码.否则容易出现调用其他的类跟着一起执行了.浪费性能不说,还容易出现错误的结果
+    doFirst1 {  //错误的展示
+        println("二一")
+    }
+
+}
+
+task three({
+//    println("三零")   // 执行这个gralde文件中的任意一个task任务 ,都会触发这一行
+    doLast {
+        println("三")
+    }
+})
+
+task four {  // 执行顺序是 0,1,2
+    doLast {
+        println("四二")  //2
+    }
+//    println("四零")  //0  执行这个gralde文件中的任意一个task任务 ,都会触发这一行
+    doFirst {
+        println("四一") //1
+    }
+
+}
+
+task five() {
+//    println("五零")  // 执行这个gralde文件中的任意一个task任务 ,都会触发这一行
+    doLast {
+        println("五")
+    }
+}
+
+// map
+task testMymap << {
+    def list = ["a": "aa", "b": "bb"];
+
+    list.each {
+//        println list.get(it.key) + "===" + it.getValue()  //运行结果: aa===aa   bb===bb ;
+        println it    // a=aa   b=bb
+    }
+}
+
+//method
+task testMethod << {
+    println(m1(1, 2, 3))
+}
+
+def int m1(int a, int b, int c) {
+    def aa = a + b + c
+    return aa;
+}
+//-------------------------------闭包测试开始-------------------------------------------------
+//java bean 和闭包
+
+//闭包定义格式
+//def xxx = {paramters ->; code}  //或者
+//def xxx = {无参数，纯code}  这种case不需要->;符号
+
+
+def testCls = { int a, int b ->
+    println("a+b = " + (a + b) + ";")
+}
+
+task testClosure << {
+    testCls.call(1, 2)
+}
+
+task javabean << {
+    Person person = new Person("张三丰", "108")
+    println("name : ${person.getName()}  ,age : ${person.getAge()}")
+    customEach2 { a, b ->
+        println("name : ${a} , age : ${b}")
+    }
+}
+
+//闭包
+def customEach2(closure) {
+    Person person = new Person("zhang", "120")
+    closure(person.getName(), person.getAge())
+}
+
+def customEach(closure) {
+    for (int i = 0; i < 10; i++) {
+        closure(i)
+    }
+}
+
+task printCustom << {  //4种方式是等价的
+    //标准
+    customEach { a ->
+        print a + " "
+    }
+    println("")
+    //常规 简写
+    customEach {
+        print it + "  "
+    }
+
+    println("")
+    //groovy特性  稍微简写
+    customEach() {
+        print it + "   "
+    }
+
+    println("")
+    //正常写法
+    customEach({
+        print it + "    "
+    })
+
+    logger.info('info')
+    logger.debug('dubug')
+    logger.warn('warn')
+    logger.error('error')
+    logger.lifecycle('lifecycle')
+    logger.quiet('最高级别quiet')
+
+    //发现他们的执行顺序会发生变化
+}
+
+class Person {
+    private String name;
+    private String age;
+
+    Person(String name, String age) {
+        this.name = name
+        this.age = age
+    }
+
+    String getName() {
+        return name
+    }
+
+    void setName(String name) {
+        this.name = name
+    }
+
+    String getAge() {
+        return age
+    }
+
+    void setAge(String age) {
+        this.age = age
+    }
+}
+
+//-------------------------------闭包测试结束-------------------------------------------------
+
+//任务依赖
+
+task testdepends {
+    dependsOn four, two, one //这三个的执行顺序没有先后,随机的
+    doLast {
+        println("testdepends")
+    }
+}
+
+println "In app build.gralde id is : "+gradle.hashCode()
