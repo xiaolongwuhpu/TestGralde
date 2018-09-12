@@ -7,5 +7,15 @@ println "User Home Dir:" + gradle.gradleUserHomeDir
 println "Parent: " + gradle.parent
 
 
+def initGradlewEnvironment(){
 
+    Properties properties = new Properties();
+    File propertyFile = new File(rootDir.getAbsolutePath()+"/local.properties")
+    properties.load(propertyFile.newInputStream())
+    gradle.ext.kevin = properties.getProperty("kevin")
+    println "extra property :"+gradle.kevin
+
+}
+
+initGradlewEnvironment()
 
